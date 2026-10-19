@@ -1,3 +1,86 @@
-.venv/
+# Байт-код Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Файлы пакетов и дистрибутивов
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Файлы установщиков (PyInstaller, log)
+*.manifest
+*.spec
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Среды разработки (виртуальные окружения)
 .env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Отчёты тестирования и кэши
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# IDE и редакторы кода
+.vscode/
+.idea/
+.spyderproject
+.spyproject
+.ropeproject
+
+# Операционные системы
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Другое
+*.log
+local_settings.py
+db.sqlite3
+instance/
+.webassets-cache
+.scrapy
+docs/_build/
+.ipynb_checkpoints
+profile_default/
+ipython_config.py
+.python-version
+celerybeat-schedule
+*.sage.py
+/site
+.mypy_cache/
+.dmypy.json
+dmypy.json
