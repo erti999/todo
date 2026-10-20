@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_async_session
 from app.services.task_service import TaskService
-from app.schemas import TaskCreate, TaskUpdate
+from app.schemas.task import TaskCreate, TaskUpdate
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 DBSession = Annotated[AsyncSession, Depends(get_async_session)]

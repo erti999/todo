@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models import Task
-from app.schemas import TaskCreate, TaskUpdate
+from app.models.task import Task
+from app.schemas.task import TaskCreate, TaskUpdate
 
 class TaskService:
     @staticmethod
