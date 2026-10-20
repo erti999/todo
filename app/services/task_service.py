@@ -1,34 +1,39 @@
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Task
 from app.schemas import TaskCreate, TaskUpdate
 
-def get_tasks(db: Session):
-    statement = select(Task)
-    return db.scalars(statement).all()
+class TaskService:
+    @staticmethod
+    async def get_all(db: AsyncSession):
+        result = await db.scalars(select(Task))
+        return result.all()
 
-def create_task(db: Session, task: TaskCreate):
-    new_task = Task(title=task.title, completed=False)
-    db.add(new_task)
-    db.commit()
-    db.refresh(new_task)
-    return new_task
+    @staticmethod
+    async def create(db: AsyncSession, schema: TaskCreate):
+        task = Task(title=schema.title, completed=False)
+        db.add(task)
+        await db.commit()
+        await db.refresh(task)
+        return task
+ 
+    @staticmethod
+    async def update(db: AsyncSession, task_id: int, schema: TaskUpdate):
+        task = await db.get(Task, task_id)
+        if task is None:
+            return None
+        changes = schema.model_dump(exclude_unset=True)
+        for field, value in changes.items():
+            setattr(task, field, value)
+        await db.commit()
+        await db.refresh(task)
+        return task
 
-def update_task(db:Session, task_id: int,task: TaskUpdate):
-    db_task = db.get(Task, task_id)
-    if db_task is None:
-        return None
-    changes = task.model_dump(exclude_unset=True)
-    for field, value in changes.items():
-        setattr(db_task, field, value)
-    db.commit()
-    db.refresh(db_task)
-    return db_task
-
-def delete_task(db:Session, task_id: int):
-    db_task = db.get(Task, task_id)
-    if db_task is None:
-        return None
-    db.delete(db_task)
-    db.commit()
-    return {"message": "Задача удалена"}
+    @staticmethod
+    async def delete(db: AsyncSession, task_id: int):
+        task = await db.get(Task, task_id)
+        if task is None:
+            return None
+        await db.delete(task)
+        await db.commit()
+        return True
