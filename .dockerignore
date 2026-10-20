@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# Python кэш и байт-код
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Виртуальные окружения (локальные)
+.venv/
+venv/
+env/
+ENV/
+
+# Конфиденциальные данные и переменные окружения
+.env
+.env.*
+!.env.example
+
+# IDE / Редакторы
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker / Сборка
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Локальные логи и дампы базы данных
+*.log
+*.sql
+*.sqlite
