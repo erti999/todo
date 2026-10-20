@@ -1,0 +1,59 @@
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+stages:
+  - build
+  - deploy
+  - cleanup
+
+variables:
+  STACK_DIR: "/opt/docker-apps/${CI_PROJECT_NAME}"
+  IMAGE_NAME: "${CI_PROJECT_PATH_SLUG}"
+  KEEP_IMAGES: "2"
+
+build-job:
+  stage: build
+  image: docker:24
+  script:
+    - echo "Сборка Docker-образа ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+    - docker build -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
+  tags:
+    - cettest
+
+deploy-job:
+  stage: deploy
+  image: docker:24
+  script:
+    - mkdir -p ${STACK_DIR}
+    - cp docker-compose.yml ${STACK_DIR}/docker-compose.yml
+    - cd ${STACK_DIR}
+
+    - |
+      cat > .env <<EOF
+      COMPOSE_PROJECT_NAME=$CI_PROJECT_PATH_SLUG
+      IMAGE_NAME=$IMAGE_NAME
+      CI_COMMIT_SHORT_SHA=$CI_COMMIT_SHORT_SHA
+      DB_NAME=$APP_DB_NAME
+      DB_USERNAME=$APP_DB_USERNAME
+      DB_PASSWORD=$APP_DB_PASSWORD
+      DOMAIN=todo.cettest.tvsi.ru
+      EOF
+    - chmod 600 .env
+    - docker compose config --quiet
+    - docker compose up -d --no-build --remove-orphans
+    - docker compose ps
+  tags:
+    - cettest
+  needs: ["build-job"]
+
+
+cleanup-job:
+  stage: cleanup
+  image: docker:24
+  script:
+    - docker images "${IMAGE_NAME}"
+  tags:
+    - cettest
+  needs: ["deploy-job"]
+  when: on_success

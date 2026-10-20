@@ -21,7 +21,7 @@ services:
       timeout: 5s
       retries: 5
   migrator:
-    build: .
+    image: "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
     restart: no
     command: alembic upgrade head
     environment:
@@ -37,7 +37,7 @@ services:
       db:
         condition: service_healthy
   backend:
-    build: .
+    image: "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql+asyncpg://${DB_USERNAME}:${DB_PASSWORD}@db:5432/${DB_NAME}
