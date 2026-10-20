@@ -52,7 +52,13 @@ cleanup-job:
   stage: cleanup
   image: docker:24
   script:
-    - docker images "${IMAGE_NAME}"
+    - echo "Удаление старых локальных образов ${IMAGE_NAME}, оставляем только последние ${KEEP_IMAGES}"
+    - |
+      docker images ${IMAGE_NAME} --format "{{.ID}} {{.CreatedAt}}" | \
+        sort -r -k2 | \
+        tail -n +$((${KEEP_IMAGES} + 1)) | \
+        awk '{print $1}' | \
+        xargs -r docker rmi 2>/dev/null || true
   tags:
     - cettest
   needs: ["deploy-job"]
