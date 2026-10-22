@@ -1,6 +1,16 @@
 workflow:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
+      variables:
+        RUNNER_TAG: "cetserver"
+        DEPLOY_ENV: "production"
+
+    - if: '$CI_COMMIT_BRANCH == "stage"'
+      variables:
+        RUNNER_TAG: "cettest"
+        DEPLOY_ENV: "staging"
+
+    - when: never
 
 stages:
   - build
@@ -19,7 +29,7 @@ build-job:
     - echo "Сборка Docker-образа ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
     - docker build -t ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA} .
   tags:
-    - cettest
+    - $RUNNER_TAG
 
 deploy-job:
   stage: deploy
@@ -37,14 +47,16 @@ deploy-job:
       DB_NAME=$APP_DB_NAME
       DB_USERNAME=$APP_DB_USERNAME
       DB_PASSWORD=$APP_DB_PASSWORD
-      DOMAIN=todo.cettest.tvsi.ru
+      DOMAIN=$DOMAIN
       EOF
     - chmod 600 .env
     - docker compose config --quiet
     - docker compose up -d --no-build --remove-orphans
     - docker compose ps
   tags:
-    - cettest
+    - $RUNNER_TAG
+  environment:
+    name: $DEPLOY_ENV
   needs: ["build-job"]
 
 
@@ -60,6 +72,6 @@ cleanup-job:
         awk '{print $1}' | \
         xargs -r docker rmi 2>/dev/null || true
   tags:
-    - cettest
+    - $RUNNER_TAG
   needs: ["deploy-job"]
   when: on_success
